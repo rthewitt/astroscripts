@@ -15,6 +15,9 @@ STUD_DIR="$BASEDIR/$PUBLIC_STUDENT"
 PRIV_DIR="$BASEDIR/$INTERNAL"
 PUBLIC_DIR="$BASEDIR/$GIT_REPOS"
 
+PROTO_BRANCH=PROTOTYPE
+NAMESPACE_ST=STUDENT
+
 function f_yesno() {
    echo -n "$1 (y/n) "
    read ans
@@ -32,6 +35,11 @@ function pause() {
 
 function m_log() {
    echo "$1" >> $LOGFILE
+}
+
+fail() {
+   m_log "$1"
+   exit 1
 }
 
 # This is only necessary for dumb transport, change to git+ssh

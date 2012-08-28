@@ -13,9 +13,6 @@ shift
 names=($1)
 NUM_STUDENTS=${#names[@]}
 
-PROTO_BRANCH=PROTOTYPE
-NAMESPACE_ST=STUDENT
-
 [ -d "$PRIV_DIR" ] || mkdir -p "$PRIV_DIR"
 [ -d "$PUBLIC_DIR" ] || mkdir -p "$PUBLIC_DIR"
 [ -d "$PROF_DIR" ] || mkdir -p "$PROF_DIR"
