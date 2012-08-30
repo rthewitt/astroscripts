@@ -52,6 +52,7 @@ for branch in ${student_branches[@]}; do
    # consider sqash / no-ff, if we want different commit messages
    # Can students modify/revert/ammend this commit and affect PROTO?
    echo "merging: $COMMIT int $branch"
+   # Did I really just pull from the PROTO branch?!
    git merge $COMMIT
    echo "pushing, may not always want to."
    git push
