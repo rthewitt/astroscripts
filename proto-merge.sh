@@ -10,6 +10,7 @@
 
 #TODO do any necessary testing before merge using fetch.  Consider no-ff for revert compared to reset.
 
+echo "INSIDE BASH SCRIPT"
 
 source $( dirname $0 )/setenv.sh
 

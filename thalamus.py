@@ -15,7 +15,7 @@ class default_handler(object):
       print "WHOA NELLY"
 
 conn = stomp.Connection([('localhost',61613)])
-command_map = {"INITIALIZE": InitCommand, "MERGE_REQUEST": UpdateCommand} 
+command_map = {"INITIALIZE": InitCommand, "UPDATE_CLASS": UpdateCommand} 
 conn.set_listener('', JSONListener(command_map, default_handler))
 conn.start()
 conn.connect()

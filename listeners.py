@@ -14,11 +14,15 @@ class JSONListener(object):
    def on_message(self, headers, message):
       print 'received a message %s' % message
       j_message = json.loads(message)
+      print 'moving to if statement'
       if 'command' in j_message:
-         # TODO test default with modified string
+         print  'command existed'
          action = j_message['command']
-         action = "Break"
-         context = j_message['context']
+         print "command was", action
+         try:
+            context = j_message['context']
+         except Exception, err:
+            print 'gotcha', str(err)
          command = self.commands.get(action, self.default)(context)
          command.do() # hope
       else:
