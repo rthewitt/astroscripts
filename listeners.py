@@ -21,9 +21,9 @@ class JSONListener(object):
          print "command was", action
          try:
             context = j_message['context']
+            command = self.commands.get(action, self.default)(context)
+            command.do() # hope
          except Exception, err:
             print 'gotcha', str(err)
-         command = self.commands.get(action, self.default)(context)
-         command.do() # hope
       else:
          print "Unrecognized broadcast"

@@ -42,6 +42,8 @@ fail() {
    exit 1
 }
 
+# ================ Git specific functions =============
+
 # This is only necessary for dumb transport, change to git+ssh
 function make_server_ready() {
    # subshell to avoid hopping back and forth
@@ -50,4 +52,13 @@ function make_server_ready() {
       mv hooks/post-update.sample hooks/post-update
       git update-server-info
    )
+}
+
+# decorator function for getting student branches
+function get_student_branch_array() {
+   local __resultvar=$1
+   bstr=""; for b in `git branch | grep "$NAMESPACE_ST"`; do bstr="$bstr $b"; done
+   local -a internal_array=($bstr)
+   [ "${#internal_array[@]}" -gt 0 ] || fail "No student branches found..."
+   eval $__resultvar="'${internal_array[@]}'"
 }

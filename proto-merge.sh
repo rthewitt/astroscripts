@@ -3,19 +3,30 @@
 # all branches. Eventual behavior = specific student (self-paced), possibly merge from external prototype
 
 # Revisit getops for --all and -s <student-id>, etc
+
+echo "INSIDE BASH SCRIPT"
+
+echo "$#" arguments
+
 [ "$#" -lt 2 ] && echo "Course name and commit hash must be provided" && exit 1
 
 #TODO post-receive hook on student repos should force merge on internal working trees
 # and send pull requests to professor
 
-#TODO do any necessary testing before merge using fetch.  Consider no-ff for revert compared to reset.
-
-echo "INSIDE BASH SCRIPT"
-
 source $( dirname $0 )/setenv.sh
 
 COURSE="$1"
 COMMIT="$2"
+
+# Do error handling!
+STRATEGY="NONE"
+if [ "$#" -gt 2 ]; then
+   STUDENT_BRANCH="$NAMESPACE_ST-$3"
+   echo "set student branch to $STUDENT_BRANCH"
+   STRATEGY="INDIVIDUAL"
+else
+   STRATEGY="CLASS"
+fi
 
 problem=false
 folder=""
@@ -24,7 +35,7 @@ folder=""
 [ -d "$PROF_DIR" ] || problem=true && folder="$PROF_DIR"
 [ -d "$PUBLIC_DIR/$COURSE" ] || problem=true && folder="$COURSE in $PUBLIC_DIR"
 
-# TODO read up on process redirection.  logging may not be best practice
+# TODO read up on process redirection.  logging from bash may not be best practice
 if $problem; then fail "folder $folder not found"; fi;
 
 
@@ -36,27 +47,36 @@ cd $PROF_DIR/$COURSE
 # MUST UNDERSTAND THIS BEHAVIOR, MAKES NO SENSE
 git checkout $PROTO_BRANCH
 
-# What is the purpose of the prototype branch?
+# What is the purpose of the internal prototype branch?
 #git fetch --tags proto
 
-# TODO move this into shared function.  Change echo to log.  Move test to start of prog
-bstr=""; for b in `git branch | grep "$NAMESPACE_ST"`; do bstr="$bstr $b"; done
-declare -a student_branches=($bstr)
-[ "${#student_branches[@]}" -gt 0 ] || fail "No student branches found..."
-
-
-# We could just use bstr, leave arrays out of this
-for branch in ${student_branches[@]}; do
-   git checkout $branch
-   echo "updating local: $branch"
+function merge_from_proto() {
+   echo "$1" # verify that this is local only
+   the_branch="$1"
+   git checkout $the_branch
+   echo "updating local: $the_branch"
    git pull
    # consider sqash / no-ff, if we want different commit messages
-   # Can students modify/revert/ammend this commit and affect PROTO?
-   echo "merging: $COMMIT int $branch"
-   # Did I really just pull from the PROTO branch?!
+   echo "merging: $COMMIT int $the_branch"
+   # One possible reason to continue merging from branch is to test
+   # tutorial additions (pulls from new repos) before merging into
+   # student branches.  Fetch / merge should also be used.
    git merge $COMMIT
    echo "pushing, may not always want to."
    git push
-done
+}
+
+# if strategy is class
+if [ "$STRATEGY" == "CLASS" ]; then
+   student_branches=""
+   get_student_branch_array student_branches
+
+   for branch in ${student_branches[@]}; do
+      merge_from_proto $branch
+   done
+elif [ "$STRATEGY" == "INDIVIDUAL" ]; then
+   merge_from_proto $STUDENT_BRANCH
+else fail "Invalid merge strategy, check arguments; exiting script."
+fi
 
 git checkout $PROTO_BRANCH

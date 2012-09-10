@@ -46,12 +46,24 @@ class UpdateCommand(Command):
    def __init__(self, context):
       super( UpdateCommand, self).__init__(context)
       self.next_commit = context['commitRef']
+      try:
+         pass
+        # self.student = context['student']
+      except Exception, err:
+         print "problem getting student from context", err
+     # if student is not None:
+      #   self.student = student
       print 'next was: ', self.next_commit
 
    # TODO determine if self should be used given overwrite possibility.  Mad security leak
    def do(self):
-      print 'calling...'
+      self.student = None
+      proc_arr = [ self.update_script, self.course_name, self.next_commit ]
       try:
-         call([ self.update_script,  self.course_name, self.next_commit ])
+         if self.student is not None:
+            proc_arr.append(self.student)
+         print 'calling...'
+         call(proc_arr)
+      #   call([ self.update_script, self.course_name, self.next_commit ])
       except Exception, fu:
-         print "crud", str(ru)
+         print "crud", str(fu)
