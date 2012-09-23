@@ -6,11 +6,11 @@ import json
 import stomp
 
 
-if not len(sys.argv[1:]) == 2:
-   print 'usage: notify.py <student_id> <commit>'
+if not len(sys.argv[1:]) == 3:
+   print 'usage: notify.py <course_name> <student_id> <commit>'
    sys.exit(1)
 
-command = json.dumps({'command': 'ADVANCE', 'context': {'studentId': sys.argv[1], 'commit': sys.argv[2]}})
+command = json.dumps({'command': 'ADVANCE_STUDENT', 'context': {'courseName': sys.argv[1], 'studentId': sys.argv[2], 'commit': sys.argv[3]}})
 
 class NotifyListener(object):
    def on_error(self, headers, message):
@@ -28,9 +28,7 @@ conn.connect()
 # Currently not listening - if we do, probably on a feedback queue
 #conn.subscribe(destination='/queue/test', ack='auto')
 
-# Here, we may want to send the current commit hash, so that we can
-# revert/reset later if there's a problem
-conn.send(' '.join(sys.argv[1:]), destination='/queue/incoming')
+conn.send(command, destination='/queue/incoming')
 
 # NOTE
 # We're currently sending the message to a queue.  We may wish to have a richer ecosystem

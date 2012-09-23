@@ -40,6 +40,7 @@ x=0
 while [ "$x" -lt $NUM_STUDENTS ]; do
    reponame=${names[$x]}
    git clone --bare . $PUBLIC_DIR/$COURSE/$reponame.git 
+   cp $BIN_DIR/hooks/student-hooks/* $PUBLIC_DIR/$COURSE/$reponame.git/hooks/
    let "x++"
 done
 
@@ -84,3 +85,4 @@ git config push.default tracking
 #make_server_ready "$PUBLIC_DIR/$COURSE.git"
 
 git checkout $PROTO_BRANCH
+git pull proto

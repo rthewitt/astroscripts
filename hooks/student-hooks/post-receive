@@ -1,0 +1,16 @@
+#!/bin/bash
+
+#TODO Very important!  Student repos will be updated by system / prof.  Avoid double action
+
+DEDIR=/home/synapse/Desktop/
+BIN_DIR=/home/myelin/bin
+LOG=$DEDIR/hook.log
+
+course=`pwd | sed 's:.*/\(.*\)/.*\.git:\1:'`
+student=`pwd | sed 's:.*/\(.*\)\.git:\1:'`
+# on post-receive, this should be valid.  Verify
+this_commit=`git rev-list --all -n 1`
+
+#echo "$course $student" > "$LOG"
+
+python $BIN_DIR/notify.py $course $student $this_commit

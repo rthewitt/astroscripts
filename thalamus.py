@@ -22,5 +22,10 @@ conn.connect()
 
 conn.subscribe(destination='/queue/test', ack='auto')
 
-time.sleep(20)
+#time.sleep(20)
+
+# work on daemon...
+while True:
+   pass
+
 conn.disconnect()
