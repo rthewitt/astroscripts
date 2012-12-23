@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+# Called by post-receive hook.
+
 import time
 import sys
 import json
@@ -7,10 +9,10 @@ import stomp
 
 
 if not len(sys.argv[1:]) == 3:
-   print 'usage: notify.py <course_name> <student_id> <commit>'
+   print 'usage: notify.py <course_name> <student_id> <status_tag> <commit>'
    sys.exit(1)
 
-command = json.dumps({'command': 'ADVANCE_STUDENT', 'context': {'courseName': sys.argv[1], 'studentId': sys.argv[2], 'commit': sys.argv[3]}})
+command = json.dumps({'command': 'ADVANCE_STUDENT', 'context': {'courseName': sys.argv[1], 'studentId': sys.argv[2], 'checkpoint': sys.argv[3], 'commit': sys.argv[4]}})
 
 class NotifyListener(object):
    def on_error(self, headers, message):
