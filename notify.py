@@ -8,7 +8,7 @@ import json
 import stomp
 
 
-if not len(sys.argv[1:]) == 3:
+if not len(sys.argv[1:]) == 4:
    print 'usage: notify.py <course_name> <student_id> <status_tag> <commit>'
    sys.exit(1)
 
