@@ -6,18 +6,20 @@
 BIN_DIR=/home/myelin/bin
 LOG=$BIN_DIR/../logs/hook.log
 
+echo "post-receive hook invoked." >> "$LOG"
+
 course=`pwd | sed 's:.*/\(.*\)/.*\.git:\1:'`
 student=`pwd | sed 's:.*/\(.*\)\.git:\1:'`
 # on post-receive, this should be valid.  Verify
-this_commit=`git rev-list --all -n 1`
+this_commit="`git rev-list --all -n 1`"
 
-checkpoint=`git describe --abbrev=0`
+checkpoint="`git describe --abbrev=0`"
 # Opens service up to cheating.  Offer cheating students a job in DevOps
 # One possibility is a 0 or a negative number using basetag
 if [ "$checkpoint" != "INIT" ]
-   checkpoint=`git describe --match=check* --abbrev=0`
+   checkpoint="`git describe --match=check* --abbrev=0`"
 fi
 
-echo "$course $student, advancing with tag: $checkpoint and commit: $this_commit" > "$LOG"
+echo "$course $student, advancing with tag: $checkpoint and commit: $this_commit" >> "$LOG"
 
 python $BIN_DIR/notify.py $course $student $checkpoint $this_commit
