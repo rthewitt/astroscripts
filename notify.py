@@ -1,18 +1,22 @@
 #!/usr/bin/python
 
-# Called by post-receive hook.
+# Temporarily just being called as python->Java communication via command line.  Will rely on python objects after refactor
 
 import time
 import sys
 import json
 import stomp
 
+num_args = len(sys.argv[1:])
+type = 'request'
 
-if not len(sys.argv[1:]) == 4:
+if not num_args == 4 and not num_args == 5:
    print 'usage: notify.py <course_name> <student_id> <status_tag> <commit>'
    sys.exit(1)
+elif num_args == 5 and sys.argv[5] == '--confirm':
+   type = 'confirm'
 
-command = json.dumps({'command': 'ADVANCE_STUDENT', 'context': {'courseName': sys.argv[1], 'studentId': sys.argv[2], 'checkpoint': sys.argv[3], 'commit': sys.argv[4]}})
+command = json.dumps({'command': 'ADVANCE_STUDENT', 'context': {'status': type, 'courseName': sys.argv[1], 'studentId': sys.argv[2], 'checkpoint': sys.argv[3], 'commit': sys.argv[4]}})
 
 class NotifyListener(object):
    def on_error(self, headers, message):

@@ -16,6 +16,8 @@ echo "$#" arguments
 source $( dirname $0 )/setenv.sh
 
 COURSE="$1"
+# We've moved onto tags, this is ${basetag}-${checkpoint-number} format
+# It represents the "next" in line, incremented by Astocyte.  Will return as confirmation
 COMMIT="$2"
 
 # Do error handling!
@@ -76,6 +78,8 @@ if [ "$STRATEGY" == "CLASS" ]; then
    done
 elif [ "$STRATEGY" == "INDIVIDUAL" ]; then
    merge_from_proto $STUDENT_BRANCH
+   # send a confirmation receipt back to Astrocyte
+   python ${BIN_DIR}/notify.py $COURSE $3 $COMMIT placeholder --confirm
 else fail "Invalid merge strategy, check arguments; exiting script."
 fi
 
