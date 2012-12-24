@@ -1,17 +1,23 @@
 #!/bin/bash
 
 #TODO Very important!  Student repos will be updated by system / prof.  Avoid double action
+# Currently harmless, but easy to fix.  Check commit message and exit 0
 
-DEDIR=/home/synapse/Desktop/
 BIN_DIR=/home/myelin/bin
-LOG=$DEDIR/hook.log
+LOG=$BIN_DIR/../logs/hook.log
 
 course=`pwd | sed 's:.*/\(.*\)/.*\.git:\1:'`
 student=`pwd | sed 's:.*/\(.*\)\.git:\1:'`
 # on post-receive, this should be valid.  Verify
 this_commit=`git rev-list --all -n 1`
-checkpoint=`git describe --match=check* --abbrev=0`
 
-#echo "$course $student" > "$LOG"
+checkpoint=`git describe --abbrev=0`
+# Opens service up to cheating.  Offer cheating students a job in DevOps
+# One possibility is a 0 or a negative number using basetag
+if [ "$checkpoint" != "INIT" ]
+   checkpoint=`git describe --match=check* --abbrev=0`
+fi
+
+echo "$course $student, advancing with tag: $checkpoint and commit: $this_commit" > "$LOG"
 
 python $BIN_DIR/notify.py $course $student $checkpoint $this_commit
