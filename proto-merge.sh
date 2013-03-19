@@ -8,7 +8,7 @@ echo "INSIDE BASH SCRIPT"
 
 echo "$#" arguments
 
-[ "$#" -lt 2 ] && echo "Course name and commit hash must be provided" && exit 1
+[ "$#" -lt 2 ] && echo "Course uuid and commit hash must be provided" && exit 1
 
 #TODO post-receive hook on student repos should force merge on internal working trees
 # and send pull requests to professor

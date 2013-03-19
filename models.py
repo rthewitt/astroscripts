@@ -9,7 +9,7 @@ class Command(object):
    
    def __init__(self, context):
       super(Command, self).__init__()
-      self.course_name = context['courseName']
+      self.course_uuid = context['courseUUID']
       self.prototype = context['prototype']
 
    # we could just use __call__, but I don't want inheritance
@@ -31,7 +31,7 @@ class InitCommand(Command):
    def do(self):
       print "INSIDE"
       try:
-         call([ self.setup_script, self.course_name, self.prototype['repository'], self._get_students_as_string() ])
+         call([ self.setup_script, self.course_uuid, self.prototype['repository'], self._get_students_as_string() ])
       except Exception, fu:
          print "Crap", str(fu)
 
@@ -53,7 +53,7 @@ class UpdateCommand(Command):
 
    # TODO determine if self should be used given overwrite possibility.  Mad security leak
    def do(self):
-      proc_arr = [ self.update_script, self.course_name, self.next_commit ]
+      proc_arr = [ self.update_script, self.course_uuid, self.next_commit ]
       try:
          if self.student is not None:
             proc_arr.append(self.student)

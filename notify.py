@@ -11,7 +11,7 @@ num_args = len(sys.argv[1:])
 type = 'request'
 
 if not num_args == 4 and not num_args == 5:
-   print 'usage: notify.py <course_name> <student_id> <status_tag> <commit>'
+   print 'usage: notify.py <course_uuid> <student_id> <status_tag> <commit>'
    sys.exit(1)
 elif num_args == 5 and sys.argv[5] == '--confirm':
    type = 'confirm'
