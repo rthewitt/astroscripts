@@ -1,4 +1,5 @@
-from boto import boto
+import boto
+import boto.vpc
 import sys
 #from boto.vpc import VPCConnection
 #
@@ -14,15 +15,15 @@ import sys
 
 mpi_conn = boto.vpc.connect_to_region('us-west-2')
 
-for vpc in mpi_conn:
-   if vpc.id == 'vpc-7af5cb13':
+for cloud in mpi_conn.get_all_vpcs():
+   if cloud.id == 'vpc-7af5cb13':
       break
 
 # Problem here, handle it
-if vpc == None or vpc.id != 'vpc-7af5cb13':
+if cloud == None or cloud.id != 'vpc-7af5cb13':
    sys.exit()
 
-for sn in mpi_conn.get_all_subnets:
+for sn in mpi_conn.get_all_subnets():
    if sn.id == 'subnet-55f5cb3c':
       break
 
@@ -37,8 +38,13 @@ if sn == None or sn.id != 'subnet-55f5cb3c':
 # either with adidtional_info or something.  They used an array and they chose metadata via index.  TODO recover
 
 image_id='ami-48c94378'
+
+# -----TEMPORARY DATA----
 # create a client token for request, or each machine (idempotency)
 client_token='slSCXikdksOOLsp'
+s_groups = ['sg-763e201a']
+num_students = 1
+# -----------------------
 
-mpi_conn.run_instances(image_id, min_count=1, max_count=num_students, key_name='neurogenesis', security_groups=['Student VM'], instance_type='t1.micro', subnet_id=sn.id, disable_api_termination=False, instance_initiated_shutdown_behavior=None, private_ip_address=None, client_token=None, security_group_ids=None, additional_info=None, network_interfaces=None)
+mpi_conn.run_instances(image_id, min_count=1, max_count=num_students, key_name='neurogenesis', instance_type='t1.micro', subnet_id=sn.id, disable_api_termination=False, instance_initiated_shutdown_behavior=None, private_ip_address=None, client_token=None, security_group_ids=s_groups, additional_info=None, network_interfaces=None)
 
