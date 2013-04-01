@@ -59,7 +59,11 @@ class ProvisionCommand(Command):
    def do(self):
       print "Starting provision with Boto for image type", self.image_type, "and token", self.token, "with students", " ".join(self.student_ids)
       try:
-         provision.provision_boto(self.image_type, self.student_ids, self.init_ref, self.token)
+         reservation = provision.provision_boto(self.image_type, self.student_ids, self.init_ref, self.token)
+         print "boto reservation received:", reservation
+         print "separately printing by inspection"
+         for item in reservation:
+            print "item:", item
       except Exception, pe:
          notify.send_receipt({'status':'failure', 'type':'PROVISION_VM', 'courseUUID': self.course_uuid, 'id':self.command_id, 'message': str(pe)})
 
