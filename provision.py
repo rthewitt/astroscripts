@@ -96,18 +96,19 @@ def provision_boto(image_type, student_ids, init_ref, token):
    for minion in expected:
       for count in range(0,4):
          if minion not in sk.list_keys()['minions_pre']:
-            print "minion not yet detected, sleeping"
+            print "minion "+minion+"not yet detected, sleeping"
+            print sk.list_keys()
             time.sleep(30)
          else:
             break
       if minion not in sk.list_keys()['minions_pre']:
-         raise Exception("minion", minion, "not found")
+         raise Exception("minion "+minion+"not found")
       # accept these instances via salt-key
       sk.accept(minion)
 
    for minion in expected:
       if minion not in rc.cmd('manage.status',[])['up']:
-         raise Exception("Minion not responding:", minion)
+         raise Exception("Minion not responding: "+ minion)
 
    ret = lc.cmd('roles:student', 'state.highstate', [], expr_form='grain') 
    print "result of highstate", ret
