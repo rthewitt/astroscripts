@@ -107,7 +107,7 @@ def provision_boto(image_type, student_ids, init_ref, token):
 
 
 
-def test(image_type='STUDENT', student_ids=['test-1','test-2'], init_ref='check-0', token=None):
+def test(image_type='STUDENT', student_ids=['test-student-1','test-student-2'], init_ref='check-0', token=None):
    if token is None:
       raise Exception('must provide token')
    return provision_boto(image_type, student_ids, init_ref, 'test-token-'+token)
