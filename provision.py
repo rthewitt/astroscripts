@@ -8,8 +8,9 @@ from jinja2 import Environment, FileSystemLoader
 def provision_boto(image_type, student_ids, init_ref, token):
    """ Provisions against MPI VPC on Amazon AWS. Need to place important cloud information into properties or global map """
    # image_id = ... ... mpi_conn.get_all_snapshots
+      # old image_id='ami-d245d1e2'
    if image_type == "STUDENT":
-      image_id='ami-d245d1e2'
+      image_id='ami-ce73e7fe'
    else:
       # Cloud Base image_id='ami-48c94378'
       raise Exception("Cannot provision image type "+image_type)
@@ -96,17 +97,24 @@ def provision_boto(image_type, student_ids, init_ref, token):
    for minion in expected:
       for count in range(0,4):
          if minion not in sk.list_keys()['minions_pre']:
-            print "minion "+minion+"not yet detected, sleeping"
+            print "minion "+minion+" not yet detected, sleeping"
             print sk.list_keys()
             time.sleep(30)
          else:
             break
       if minion not in sk.list_keys()['minions_pre']:
-         raise Exception("minion "+minion+"not found")
+         raise Exception("minion "+minion+" not found")
       # accept these instances via salt-key
       sk.accept(minion)
 
    for minion in expected:
+      for count in range(0,4):
+         if minion not in rc.cmd('manage.status',[])['up']:
+            print "minion " + minion + " not actively responding, sleeping"
+            print rc.cmd('manage.status',[])
+            time.sleep(30)
+         else:
+            break
       if minion not in rc.cmd('manage.status',[])['up']:
          raise Exception("Minion not responding: "+ minion)
 
