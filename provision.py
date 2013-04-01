@@ -96,7 +96,7 @@ def provision_boto(image_type, student_ids, init_ref, token):
    for minion in expected:
       if minion not in sk.list_keys()['minions_pre']:
          print "minion not yet detected, sleeping once"
-         sleep(30)
+         time.sleep(30)
          if minion not in sk.list_keys()['minions_pre']:
             raise Exception("minion", minion, "not found")
       # accept these instances via salt-key
