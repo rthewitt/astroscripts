@@ -94,7 +94,7 @@ def provision_boto(image_type, student_ids, init_ref, token):
       ff.write(student_pillar)
 
    for minion in expected:
-      for count in range(0,3):
+      for count in range(0,4):
          if minion not in sk.list_keys()['minions_pre']:
             print "minion not yet detected, sleeping"
             time.sleep(30)
@@ -103,7 +103,7 @@ def provision_boto(image_type, student_ids, init_ref, token):
       if minion not in sk.list_keys()['minions_pre']:
          raise Exception("minion", minion, "not found")
       # accept these instances via salt-key
-      sk.accept_key(minion)
+      sk.accept(minion)
 
    for minion in expected:
       if minion not in rc.cmd('manage.status',[])['up']:
