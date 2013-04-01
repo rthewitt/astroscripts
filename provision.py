@@ -45,7 +45,7 @@ def provision_boto(image_type, student_ids, init_ref, token):
 
    # loop until reservation instances are running
    pending = True
-   while pending
+   while pending:
       instances = w_res.instances
       pending = False
       for instance in instances:
@@ -69,17 +69,18 @@ def provision_boto(image_type, student_ids, init_ref, token):
    # ====== HANDLE SALT ===========
    opts = salt.config.master_config('/etc/salt/master')
    sk = salt.key.Key(opts)
-   lc = salt.client.LocalClient(opts)
+   lc = salt.client.LocalClient()
    rc = salt.runner.RunnerClient(opts)
 
    # rc.cmd('manage.status',[]) ['up'/'down']
    # sk.list_keys() ['minions' / 'minions_pre' / 'minions_rejected']
 
    expected = [i.private_dns_name.split('.')[0] for i in instances]
-   if not len(expected) == len(student_ids):
+   print "expected", expected
+   if len(expected) == len(student_ids):
       s_data = zip(expected, student_ids)
    else:
-      raise Exception("Something went wrong: "+len(student_ids)+" students and "+len(expected)+" minions")
+      raise Exception("Something went wrong: "+str(len(student_ids))+" students and "+str(len(expected))+" minions")
 
    # jinja template
    t_env = Environment(loader=FileSystemLoader('templates'))
@@ -103,7 +104,7 @@ def provision_boto(image_type, student_ids, init_ref, token):
 
    for minion in expected:
       if minion not in rc.cmd('manage.status',[])['up']:
-         raise Exception("Minion not responding:", minion
+         raise Exception("Minion not responding:", minion)
 
 
 
