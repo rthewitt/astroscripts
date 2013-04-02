@@ -4,21 +4,22 @@ import time
 import sys
 import json
 import stomp
+import logging
 
+logger = logging.getLogger('thalamus')
 
 class NotifyListener(object):
    def on_error(self, headers, message):
-      print 'received an error %s' % message
+      logger.error('received a message %s', message)
 
    def on_message(self, headers, message):
-      print 'received a message %s' % message
-
+      logger.info('received a message %s', message)
 
 def main():
    num_args = len(sys.argv[1:])
    type = 'request'
    if not num_args == 4 and not num_args == 5:
-      print 'usage: receipt.py <course_uuid> <student_id> <status_tag> <commit>'
+      logger.error('usage: receipt.py <course_uuid> <student_id> <status_tag> <commit>')
       sys.exit(1)
    elif num_args == 5 and sys.argv[5] == '--confirm':
       type = 'confirm'
@@ -27,13 +28,13 @@ def main():
 
 def send_receipt(map_values):
    command = json.dumps({'command': 'RECEIPT', 'context': map_values})
-   print "sending", command
+   logger.info("sending %s", command)
    send(command)
    
 def send(payload):
    conn = stomp.Connection([('localhost',61613)])
    conn.set_listener('', NotifyListener())
-   print 'set up connection'
+   logger.info('set up connection')
    conn.start()
    conn.connect()
    conn.send(payload, destination='/queue/incoming')

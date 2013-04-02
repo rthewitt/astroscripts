@@ -1,4 +1,7 @@
 import json
+import logging
+
+logger = logging.getLogger('thalamus')
 
 # Set up a shared class for command flow, somewhere
 class JSONListener(object):
@@ -9,21 +12,21 @@ class JSONListener(object):
       self.default = default # will likely be an error broadcast
 
    def on_error(self, headers, message):
-      print 'received an error %s' % message
+      logger.error('received an error %s', message)
 
    def on_message(self, headers, message):
-      print 'received a message %s' % message
+      logger.info('received a message %s', message)
       j_message = json.loads(message)
-      print 'moving to if statement'
+      logger.debug('moving to if statement')
       if 'command' in j_message:
-         print  'command existed'
+         logger.debug('command existed')
          action = j_message['command']
-         print "command was", action
+         logger.debug("command was %s", action)
          try:
             context = j_message['context']
             command = self.commands.get(action, self.default)(context)
             command.do() # hope
          except Exception, err:
-            print 'gotcha', str(err)
+            logger.error('Problem in JSONListener:\n%s', str(err))
       else:
-         print "Unrecognized broadcast"
+         logger.warn("Unrecognized broadcast")

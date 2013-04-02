@@ -8,6 +8,12 @@ from listeners import JSONListener
 from models import InitCommand, UpdateCommand, ProvisionCommand
 import logging
 
+logger = logging.getLogger('thalamus')
+hdlr = logging.FileHandler('/var/log/mpi/thalamus.log')
+formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+hdlr.setFormatter(formatter)
+logger.addHandler(hdlr) 
+logger.setLevel(logging.INFO)
 
 
 # Handle SIGTERM stops
@@ -18,17 +24,6 @@ def stop(signum, frame):
 
 signal.signal(signal.SIGTERM, stop)
 
-#=============================================
-logger = logging.getLogger('thalamus')
-hdlr = logging.FileHandler('/var/log/mpi/thalamus.log')
-formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-hdlr.setFormatter(formatter)
-logger.addHandler(hdlr) 
-logger.setLevel(logging.INFO)
-
-#logger.error('We have a problem')
-logger.info('signal setup complete')
-#=============================================
 
 #conn.disconnect() # This may no longer be necessary. Stop handler?
 
@@ -39,8 +34,9 @@ def main():
    conn.start()
    conn.connect()
    conn.subscribe(destination='/queue/test', ack='auto')
+   logger.info('Thalamus service started, listening for control.')
    while not stop_event.is_set():
-      logger.info("sleeping")
+      logger.debug("sleeping")
       time.sleep(3)
 
 # if command do was __call__, this could be a function
@@ -48,7 +44,7 @@ class default_handler(object):
    def __init__(self, context):
       super(default_handler, self).__init__()
    def do(self):
-      print "Command mapping not found!"
+      logger.warn("Command mapping not found!")
 
 if __name__ == '__main__':
    main()

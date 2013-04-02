@@ -2,7 +2,10 @@ from subprocess import call
 import myutil
 import notify
 import provision
+import logging
 #import LookupError
+
+logger = logging.getLogger('thalamus')
 
 class Tutorial(object):
    pass
@@ -33,7 +36,7 @@ class InitCommand(Command):
       self.students = context['students']
 
    def do(self):
-      print "INSIDE"
+      logger.debug("INSIDE")
       try:
          call([ self.setup_script, self.course_uuid, self.prototype['repository'], self._get_students_as_string() ])
          notify.send_receipt({'status':'success', 'type':'INITIALIZE', 'courseUUID': self.course_uuid, 'id':self.command_id})
@@ -57,14 +60,13 @@ class ProvisionCommand(Command):
       self.image_type = context["type"]
 
    def do(self):
-      print "Starting provision with Boto for image type", self.image_type, "and token", self.token, "with students", " ".join(self.student_ids)
+      logger.info("Starting provision with Boto for image type %s and token %s with students %s", self.image_type, self.token, " ".join(self.student_ids))
       try:
          reservation = provision.provision_boto(self.image_type, self.student_ids, self.init_ref, self.token)
-         print "boto reservation received:", reservation
-         print "separately printing by inspection"
-         for item in reservation:
-            print "item:", item
+         logger.info("boto reservation received:", reservation)
+         logger.info("Instances prepared: %s", " ".join([instance.id for instance in reservation.instances]))
       except Exception, pe:
+         logger.error("Problem provisioning instances for course: \n%s", str(pe))
          notify.send_receipt({'status':'failure', 'type':'PROVISION_VM', 'courseUUID': self.course_uuid, 'id':self.command_id, 'message': str(pe)})
 
 
@@ -79,14 +81,14 @@ class UpdateCommand(Command):
       try:
          self.student = context['student']
       except Exception, err:
-         print "problem getting student from context", err
+         logger.error("Problem getting student from context\n%s", str(err))
 
    def do(self):
       proc_arr = [ self.update_script, self.course_uuid, self.next_commit ]
       try:
          if self.student is not None:
             proc_arr.append(self.student)
-         print 'calling...'
+         logger.info("Updating student via script %s", self.update_script)
          call(proc_arr)
       except Exception, fu:
-         print "crud", str(fu)
+         logger.error("Problem during update:\n%s", str(fu))

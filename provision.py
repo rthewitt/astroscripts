@@ -4,6 +4,9 @@ import time
 import sys
 import salt, salt.key, salt.runner, salt.client
 from jinja2 import Environment, FileSystemLoader
+import logging
+
+logging.getLogger('thalamus')
 
 def provision_boto(image_type, student_ids, init_ref, token):
    """ Provisions against MPI VPC on Amazon AWS. Need to place important cloud information into properties or global map """
@@ -52,9 +55,9 @@ def provision_boto(image_type, student_ids, init_ref, token):
       for instance in instances:
          if instance.state != 'running':
             if instance.state != 'pending':
-               print "unexpected instance state for instance", instance.id, ":", instance.state
+               logger.error("unexpected instance state for instance %s: %s", instance.id, instance.state)
             else:
-               print "instances pending..."
+               logger.debug("instances pending...")
                pending = True
                break # from for loop
       if pending:
@@ -77,7 +80,7 @@ def provision_boto(image_type, student_ids, init_ref, token):
    # sk.list_keys() ['minions' / 'minions_pre' / 'minions_rejected']
 
    expected = [i.private_dns_name.split('.')[0] for i in instances]
-   print "expected", expected
+   logger.debug("expected %s", expected)
    if len(expected) == len(student_ids):
       s_data = zip(expected, student_ids)
    else:
@@ -90,15 +93,15 @@ def provision_boto(image_type, student_ids, init_ref, token):
    # write to pillar sls, and then call top after accepting minions
    # Note: they may actually top themselves after being accepted
    student_pillar = t_sls.render(minions=s_data)
-   print "rendered sls:", student_pillar
+   logger.debug("rendered sls: %s", student_pillar)
    with open("/srv/pillar/student-data.sls", "wb") as ff:
       ff.write(student_pillar)
 
    for minion in expected:
       for count in range(0,4):
          if minion not in sk.list_keys()['minions_pre']:
-            print "minion "+minion+" not yet detected, sleeping"
-            print sk.list_keys()
+            logger.debug("minion %s not yet detected, sleeping", minion)
+            logger.debug(sk.list_keys())
             time.sleep(30)
          else:
             break
@@ -110,8 +113,8 @@ def provision_boto(image_type, student_ids, init_ref, token):
    for minion in expected:
       for count in range(0,4):
          if minion not in rc.cmd('manage.status',[])['up']:
-            print "minion " + minion + " not actively responding, sleeping"
-            print rc.cmd('manage.status',[])
+            logger.debug("minion %s not actively responding, sleeping", minion)
+            logger.info(rc.cmd('manage.status',[]))
             time.sleep(30)
          else:
             break
@@ -119,7 +122,7 @@ def provision_boto(image_type, student_ids, init_ref, token):
          raise Exception("Minion not responding: "+ minion)
 
    ret = lc.cmd('roles:student', 'state.highstate', [], expr_form='grain') 
-   print "result of highstate", ret
+   logger.debug("result of highstate %s", ret)
    # Will test git
    # ret = client.cmd('*', 'cmd.run', ['ls -l'])
 
