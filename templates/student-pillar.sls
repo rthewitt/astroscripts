@@ -1,5 +1,5 @@
 #DANGER: This currently points to thalamus!!!!
-parietal-ip: danger
+parietal-ip: 172.28.1.202
 {% raw -%}
 {% if grains['id'] == 'glial' %}
 student-id: glial
