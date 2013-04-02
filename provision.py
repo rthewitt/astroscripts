@@ -6,7 +6,7 @@ import salt, salt.key, salt.runner, salt.client
 from jinja2 import Environment, FileSystemLoader
 import logging
 
-logging.getLogger('thalamus')
+logger = logging.getLogger('thalamus')
 
 def provision_boto(image_type, student_ids, init_ref, token):
    """ Provisions against MPI VPC on Amazon AWS. Need to place important cloud information into properties or global map """

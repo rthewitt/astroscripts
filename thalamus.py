@@ -7,13 +7,14 @@ import stomp
 from listeners import JSONListener
 from models import InitCommand, UpdateCommand, ProvisionCommand
 import logging
+import os
 
 logger = logging.getLogger('thalamus')
 hdlr = logging.FileHandler('/var/log/mpi/thalamus.log')
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 hdlr.setFormatter(formatter)
 logger.addHandler(hdlr) 
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 
 # Handle SIGTERM stops
@@ -35,8 +36,8 @@ def main():
    conn.connect()
    conn.subscribe(destination='/queue/test', ack='auto')
    logger.info('Thalamus service started, listening for control.')
+   logger.debug('pwd via os module %s', os.getcwd())
    while not stop_event.is_set():
-      logger.debug("sleeping")
       time.sleep(3)
 
 # if command do was __call__, this could be a function
