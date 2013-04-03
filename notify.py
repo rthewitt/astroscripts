@@ -23,7 +23,7 @@ def main():
       sys.exit(1)
    elif num_args == 5 and sys.argv[5] == '--confirm':
       type = 'confirm'
-   command = json.dumps({'command': 'ADVANCE_STUDENT', 'context': {'status': type, 'courseName': sys.argv[1], 'studentId': sys.argv[2], 'checkpoint': sys.argv[3], 'commit': sys.argv[4]}})
+   command = json.dumps({'command': 'ADVANCE_STUDENT', 'context': {'status': type, 'courseUUID': sys.argv[1], 'studentId': sys.argv[2], 'checkpoint': sys.argv[3], 'commit': sys.argv[4]}})
    send(command)
 
 def send_receipt(map_values):
