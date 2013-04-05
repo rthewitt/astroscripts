@@ -1,4 +1,4 @@
-from subprocess import call
+from subprocess import call, STDOUT
 import myutil
 import notify
 import provision
