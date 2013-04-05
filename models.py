@@ -40,7 +40,7 @@ class InitCommand(Command):
       logger.debug("INSIDE")
       try:
          with open(command_log, 'w') as c_log:
-            call([ self.setup_script, self.course_uuid, self.prototype['repository'], self._get_students_as_string() ], stdout=c_log, stderr='STDOUT')
+            call([ self.setup_script, self.course_uuid, self.prototype['repository'], self._get_students_as_string() ], stdout=c_log, stderr=STDOUT)
          notify.send_receipt({'status':'success', 'type':'INITIALIZE', 'courseUUID': self.course_uuid, 'id':self.command_id})
       except Exception, fu:
          notify.send_receipt({'status':'failure', 'type':'INITIALIZE', 'courseUUID': self.course_uuid, 'id':self.command_id, 'message': str(fu)})
@@ -92,6 +92,6 @@ class UpdateCommand(Command):
             proc_arr.append(self.student)
          logger.info("Updating student via script %s", self.update_script)
          with open(command_log, 'w') as c_log:
-            call(proc_arr, stdout=c_log, stderr='STDOUT')
+            call(proc_arr, stdout=c_log, stderr=STDOUT)
       except Exception, fu:
          logger.error("Problem during update:\n%s", str(fu))
