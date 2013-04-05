@@ -6,6 +6,7 @@ import logging
 #import LookupError
 
 logger = logging.getLogger('thalamus')
+command_log = '/var/log/mpi/myelin-action.log'
 
 class Tutorial(object):
    pass
@@ -38,7 +39,8 @@ class InitCommand(Command):
    def do(self):
       logger.debug("INSIDE")
       try:
-         call([ self.setup_script, self.course_uuid, self.prototype['repository'], self._get_students_as_string() ])
+         with open(command_log, 'w') as c_log:
+            call([ self.setup_script, self.course_uuid, self.prototype['repository'], self._get_students_as_string() ], stdout=c_log, stderr='STDOUT')
          notify.send_receipt({'status':'success', 'type':'INITIALIZE', 'courseUUID': self.course_uuid, 'id':self.command_id})
       except Exception, fu:
          notify.send_receipt({'status':'failure', 'type':'INITIALIZE', 'courseUUID': self.course_uuid, 'id':self.command_id, 'message': str(fu)})
@@ -89,6 +91,7 @@ class UpdateCommand(Command):
          if self.student is not None:
             proc_arr.append(self.student)
          logger.info("Updating student via script %s", self.update_script)
-         call(proc_arr)
+         with open(command_log, 'w') as c_log:
+            call(proc_arr, stdout=c_log, stderr='STDOUT')
       except Exception, fu:
          logger.error("Problem during update:\n%s", str(fu))
