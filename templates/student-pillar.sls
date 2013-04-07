@@ -1,5 +1,8 @@
 #DANGER: This currently points to thalamus!!!!
+# This file is managed by MPI python libraries.  Modifications will be overwritten.
+# Grains can and should be used for education specific properties now.  roles: student, learn-vm
 parietal-ip: 172.28.1.202
+course_uuid: {{ course_uuid }}
 {% raw -%}
 {% if grains['id'] == 'glial' %}
 student-id: glial

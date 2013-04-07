@@ -8,7 +8,7 @@ import logging
 
 logger = logging.getLogger('thalamus')
 
-def provision_boto(image_type, student_ids, init_ref, token):
+def provision_boto(image_type, course_uuid, student_ids, init_ref, token):
    """ Provisions against MPI VPC on Amazon AWS. Need to place important cloud information into properties or global map """
    # image_id = ... ... mpi_conn.get_all_snapshots
       # old image_id='ami-d245d1e2'
@@ -92,7 +92,7 @@ def provision_boto(image_type, student_ids, init_ref, token):
    
    # write to pillar sls, and then call top after accepting minions
    # Note: they may actually top themselves after being accepted
-   student_pillar = t_sls.render(minions=s_data)
+   student_pillar = t_sls.render(minions=s_data, course_uuid=course_uuid)
    logger.debug("rendered sls: %s", student_pillar)
    with open("/srv/pillar/student-data.sls", "wb") as ff:
       ff.write(student_pillar)
@@ -129,13 +129,13 @@ def provision_boto(image_type, student_ids, init_ref, token):
 
 
 
-def test(image_type='STUDENT', student_ids=['test-student-1','test-student-2'], init_ref='check-0', token=None):
-   if token is None:
-      raise Exception('must provide token')
-   return provision_boto(image_type, student_ids, init_ref, 'test-token-'+token)
+def test(image_type='STUDENT', course_uuid=None, student_ids=['test-student-1','test-student-2'], init_ref='check-0', token=None):
+   if token is None or course_uuid=None:
+      raise Exception('must provide course, token')
+   return provision_boto(image_type, course_uuid, student_ids, init_ref, 'test-token-'+token)
 
 def main():
-   return test(token='test-token-'+sys.argv[1])
+   return test(course_uuid=sys.argv[1], token='test-token-'+sys.argv[2])
 
 
 if __name__ == '__main__':

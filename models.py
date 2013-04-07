@@ -64,7 +64,7 @@ class ProvisionCommand(Command):
    def do(self):
       logger.info("Starting provision with Boto for image type %s and token %s with students %s", self.image_type, self.token, " ".join(self.student_ids))
       try:
-         reservation = provision.provision_boto(self.image_type, self.student_ids, self.init_ref, self.token)
+         reservation = provision.provision_boto(self.image_type, self.course_uuid, self.student_ids, self.init_ref, self.token)
          logger.info("boto reservation received:", reservation)
          logger.info("Instances prepared: %s", " ".join([instance.id for instance in reservation.instances]))
       except Exception, pe:
