@@ -64,8 +64,16 @@ class ProvisionCommand(Command):
    def do(self):
       logger.info("Starting provision with Boto for image type %s and token %s with students %s", self.image_type, self.token, " ".join(self.student_ids))
       try:
-         reservation = provision.provision_boto(self.image_type, self.course_uuid, self.student_ids, self.init_ref, self.token)
-         logger.info("boto reservation received:", reservation)
+         student_instances, reservation = provision.provision_boto(self.image_type, self.course_uuid, self.student_ids, self.init_ref, self.token)
+         instance_map = {}
+         for student, machine in student_instances:
+             logger.debug('Receipt mapping\nStudent: %s\nInstance %s', student, machine.id)
+             m_rep = {}
+             m_rep['host'] = machine.private_dns_name.split('.')[0]
+             m_rep['location'] = machine.private_ip_address
+             instance_map[student] = m_rep
+
+         notify.send_receipt({'status':'success', 'type':'PROVISION_VM', 'courseUUID': self.course_uuid, 'id':self.command_id, 'instanceMap': instance_map})
          logger.info("Instances prepared: %s", " ".join([instance.id for instance in reservation.instances]))
       except Exception, pe:
          logger.error("Problem provisioning instances for course: \n%s", str(pe))

@@ -76,10 +76,11 @@ def provision_boto(image_type, course_uuid, student_ids, init_ref, token):
    lc = salt.client.LocalClient()
    rc = salt.runner.RunnerClient(opts)
 
-   # rc.cmd('manage.status',[]) ['up'/'down']
-   # sk.list_keys() ['minions' / 'minions_pre' / 'minions_rejected']
-
+   # Full return data
+   student_instances = zip(student_ids, instances)
+   # for ease of use, data verification and pillar construction
    expected = [i.private_dns_name.split('.')[0] for i in instances]
+
    logger.debug("expected %s", expected)
    if len(expected) == len(student_ids):
       s_data = zip(expected, student_ids)
@@ -123,14 +124,14 @@ def provision_boto(image_type, course_uuid, student_ids, init_ref, token):
 
    ret = lc.cmd('roles:student', 'state.highstate', [], expr_form='grain') 
    logger.debug("result of highstate %s", ret)
-   # Will test git
-   # ret = client.cmd('*', 'cmd.run', ['ls -l'])
+   return student_instances, reservation
+
 
 
 
 
 def test(image_type='STUDENT', course_uuid=None, student_ids=['test-student-1','test-student-2'], init_ref='check-0', token=None):
-   if token is None or course_uuid=None:
+   if token is None or course_uuid is None:
       raise Exception('must provide course, token')
    return provision_boto(image_type, course_uuid, student_ids, init_ref, 'test-token-'+token)
 
