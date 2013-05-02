@@ -8,6 +8,37 @@ import logging
 
 logger = logging.getLogger('thalamus')
 
+class MockInstance(object):
+    __slots__ = ('id','private_dns_name','private_ip_address')
+    def __init__(self, id='id-glial', private_dns_name='glial.testing-only', private_ip_address='glial'):
+        self.id = id
+        self.private_dns_name = private_dns_name
+        self.private_ip_address = private_ip_address
+
+class MockReservation(object):
+    __slots__ = ('id','instances')
+    def __init__(self, id='glial-stub', instances=None):
+        self.id = id
+        if instances is not None:
+            self.instances = instances
+        else:
+            self.instances = []
+
+
+def stub_boto(image_type, course_uuid, student_ids, init_ref, token):
+    logger.info('Stubbing out boto for course_uuid :%s', course_uuid)
+    machine = MockInstance()
+    student_instances = zip(student_ids, len(student_ids)*[machine])
+    reservation = MockReservation(len(student_ids)*[machine])
+    return student_instances, reservation
+
+def terminate_machines_boto(instance_ids):
+    mpi_conn = get_mpi_connection()
+    mpi_conn.terminate_instances(instance_ids=instance_ids)
+
+def get_mpi_connection():
+   return boto.vpc.connect_to_region('us-west-2')
+
 def provision_boto(image_type, course_uuid, student_ids, init_ref, token):
    """ Provisions against MPI VPC on Amazon AWS. Need to place important cloud information into properties or global map """
    # image_id = ... ... mpi_conn.get_all_snapshots
@@ -18,7 +49,7 @@ def provision_boto(image_type, course_uuid, student_ids, init_ref, token):
       # Cloud Base image_id='ami-48c94378'
       raise Exception("Cannot provision image type "+image_type)
 
-   mpi_conn = boto.vpc.connect_to_region('us-west-2')
+   mpi_conn = get_mpi_connection()
 
    for cloud in mpi_conn.get_all_vpcs():
       if cloud.id == 'vpc-7af5cb13':

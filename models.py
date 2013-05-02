@@ -35,13 +35,14 @@ class InitCommand(Command):
    def __init__(self, context):
       super(InitCommand, self).__init__(context)
       self.students = context['students']
+      self.testing = context['testing'] in ['true','True']
 
    def do(self):
       logger.debug("INSIDE")
       try:
          with open(command_log, 'w') as c_log:
             call([ self.setup_script, self.course_uuid, self.prototype['repository'], self._get_students_as_string() ], stdout=c_log, stderr=STDOUT)
-         notify.send_receipt({'status':'success', 'type':'INITIALIZE', 'courseUUID': self.course_uuid, 'id':self.command_id})
+         notify.send_receipt({'status':'success', 'type':'INITIALIZE', 'courseUUID': self.course_uuid, 'id':self.command_id, 'testing': str(self.testing)})
       except Exception, fu:
          notify.send_receipt({'status':'failure', 'type':'INITIALIZE', 'courseUUID': self.course_uuid, 'id':self.command_id, 'message': str(fu)})
 
@@ -57,6 +58,7 @@ class ProvisionCommand(Command):
       self.token = context["token"]
       self.init_ref = context["initRef"]
       self.student_ids = context["studentIds"]
+      self.stub_out = context["testing"] in ['true','True']
       if len(self.command_id) < 1:
          self.command_id = self.token
       self.image_type = context["type"]
@@ -64,7 +66,10 @@ class ProvisionCommand(Command):
    def do(self):
       logger.info("Starting provision with Boto for image type %s and token %s with students %s", self.image_type, self.token, " ".join(self.student_ids))
       try:
-         student_instances, reservation = provision.provision_boto(self.image_type, self.course_uuid, self.student_ids, self.init_ref, self.token)
+         if self.stub_out is True:
+             student_instances, reservation = provision.stub_boto(self.image_type, self.course_uuid, self.student_ids, self.init_ref, self.token)
+         else:
+              student_instances, reservation = provision.provision_boto(self.image_type, self.course_uuid, self.student_ids, self.init_ref, self.token)
          instance_map = {}
          for student, machine in student_instances:
              logger.debug('Receipt mapping\nStudent: %s\nInstance %s', student, machine.id)
