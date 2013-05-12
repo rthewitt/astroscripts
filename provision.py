@@ -24,7 +24,7 @@ class MockReservation(object):
         else:
             self.instances = []
 
-
+# TODO extract jinja template, salt from provision and share
 def stub_boto(image_type, course_uuid, student_ids, init_ref, token):
     logger.info('Stubbing out boto for course_uuid :%s', course_uuid)
     machine = MockInstance()
@@ -43,8 +43,9 @@ def provision_boto(image_type, course_uuid, student_ids, init_ref, token):
    """ Provisions against MPI VPC on Amazon AWS. Need to place important cloud information into properties or global map """
    # image_id = ... ... mpi_conn.get_all_snapshots
       # old image_id='ami-d245d1e2'
+      # student_image_id='ami-ce73e7fe'
    if image_type == "STUDENT":
-      image_id='ami-ce73e7fe'
+      image_id='ami-1179ef21'
    else:
       # Cloud Base image_id='ami-48c94378'
       raise Exception("Cannot provision image type "+image_type)
